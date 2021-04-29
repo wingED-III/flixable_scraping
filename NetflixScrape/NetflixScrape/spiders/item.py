@@ -9,5 +9,5 @@ class MovieItem(Item):
     description = Field()
     genres = Field()
     casts = Field()
-    image_urls = Field()
-    images=Field()
+    # image_urls = Field()
+    # images=Field()

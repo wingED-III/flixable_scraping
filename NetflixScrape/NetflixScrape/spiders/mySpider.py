@@ -8,11 +8,10 @@ def_url = "https://flixable.com/pagination.php?originals=0&page="
 
 class MySpider(scrapy.Spider):
     name = "netflixSpider"
-    max_page = 150
+    max_page = 5
 
-    # start_urls = [ def_url+str(i) for i in range(1,max_page+1)]
-    # <<< FOR TEST
-    start_urls = ["https://flixable.com/pagination.php?originals=0&page=1"]
+    start_urls = [ def_url+str(i) for i in range(1,max_page+1)]
+    # start_urls = ["https://flixable.com/pagination.php?originals=0&page=1"] # <<< FOR TEST
 
     def parse(self, response):
         print(response.request.url)
@@ -31,47 +30,48 @@ class MySpider(scrapy.Spider):
         newMovie = MovieItem()
 
         movie_name = response.css('h1.title::text')
-        # released_year = response.css('.card-category > span:nth-child(1)::text')
-        # rate = response.css('.border::text')
-        # description = response.css('p.card-description::text')
-        newMovie['image_urls'] = response.xpath(
-            "//img[contains(@class,'img poster')]").extract().first()
+        released_year = response.css('.card-category > span:nth-child(1)::text')
+        rate = response.css('.border::text')
+        description = response.css('p.card-description::text')
+
+        # newMovie['image_urls'] = response.xpath(
+        #     "//img[contains(@class,'img poster')]").extract().first()
         
         elements = [
             movie_name,
-            # released_year,
-            # rate,
-            # description,
+            released_year,
+            rate,
+            description,
             # image
         ]
         for i in elements:
             i = i.get()
             print(">>>> ", i)
-        print('>>>>>',newMovie['image_urls'])
+        # print('>>>>>',newMovie['image_urls'])
         newMovie['title'] = movie_name.get()
-        # newMovie['released_year'] = released_year.get()
-        # newMovie['rate'] = rate.get()
-        # newMovie['description'] = description.get()
-        # newMovie['director'] = response.xpath("//div[@class='col-lg-8']//p[contains(.,'Director')]//span[2]//a/text()").get()
+        newMovie['released_year'] = released_year.get()
+        newMovie['rate'] = rate.get()
+        newMovie['description'] = description.get()
+        newMovie['director'] = response.xpath("//div[@class='col-lg-8']//p[contains(.,'Director')]//span[2]//a/text()").get()
 
-        # genres = []
-        # elements = response.xpath("//div[@class='col-lg-8']//p[contains(.,'Genres')]//span[2]//a/text()")
-        # for i in elements:
-        #     # print(">>>> ",i.get())
-        #     genres.append(i.get())
+        genres = []
+        elements = response.xpath("//div[@class='col-lg-8']//p[contains(.,'Genres')]//span[2]//a/text()")
+        for i in elements:
+            # print(">>>> ",i.get())
+            genres.append(i.get())
 
-        # cast = []
-        # elements = response.xpath("//div[@class='col-lg-8']//p[contains(.,'Cast')]//span[2]//a/text()")
-        # for i in elements:
-        #     # print(">>>> ",i.get())
-        #     cast.append(i.get())
+        cast = []
+        elements = response.xpath("//div[@class='col-lg-8']//p[contains(.,'Cast')]//span[2]//a/text()")
+        for i in elements:
+            # print(">>>> ",i.get())
+            cast.append(i.get())
 
-        # genres = "/".join(genres)
-        # # print(genres)
+        genres = "/".join(genres)
+        # print(genres)
 
-        # cast = "/".join(cast)
-        # # print(cast)
+        cast = "/".join(cast)
+        # print(cast)
 
-        # newMovie['genres'] = genres
-        # newMovie['casts'] = cast
+        newMovie['genres'] = genres
+        newMovie['casts'] = cast
         yield newMovie
